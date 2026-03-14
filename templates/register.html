@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Daftar - DiagnoSmart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #a18cd1, #fbc2eb, #fad0c4, #ffd1ff);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    canvas#particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    .register-box {
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(25px);
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 25px;
+      padding: 50px 40px;
+      width: 420px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 1.2s ease;
+    }
+
+    h2 {
+      color: #fff;
+      margin-bottom: 25px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      font-size: 14px;
+      color: #333;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(255, 107, 180, 0.6);
+      transform: scale(1.02);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff6bb4, #ff3c8e);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 8px 25px rgba(255, 107, 180, 0.5);
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #ff3c8e, #d6006c);
+      transform: translateY(-2px);
+    }
+
+    .link {
+      margin-top: 18px;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .link a {
+      color: #ffff66;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 25px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <div class="register-box">
+    <h2>🩺 Daftar Akun DiagnoSmart</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="password" name="confirm" placeholder="Konfirmasi Password" required>
+      <button type="submit">Daftar</button>
+    </form>
+
+    <div class="link">
+      Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a>
+    </div>
+
+    <div class="footer">© 2025 DiagnoSmart | All Rights Reserved</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 1,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5,
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
