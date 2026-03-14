@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Pasien - DiagnoSmart</title>
+  <style>
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+      background-color: #f4f9ff;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === SIDEBAR (SAMA PERSIS DENGAN DASHBOARD) === */
+    .sidebar {
+      background: linear-gradient(180deg, #007bff, #0056d6);
+      color: white;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 25px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+      border-radius: 0 25px 25px 0;
+      animation: fadeInLeft 0.8s ease;
+      z-index: 10;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 35px;
+      opacity: 0;
+      animation: fadeIn 1s 0.3s forwards;
+    }
+
+    .brand h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      letter-spacing: 0.6px;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: #cfe1ff;
+      margin-top: 3px;
+      font-style: italic;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Animasi muncul bertahap seperti dashboard */
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e3f2fd;
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      transform: translateX(-15px);
+      opacity: 0;
+      animation: fadeSlideRight 0.6s ease forwards;
+    }
+
+    /* Urutan delay muncul bertahap */
+    .nav-menu a:nth-child(1) { animation-delay: 0.4s; }
+    .nav-menu a:nth-child(2) { animation-delay: 0.6s; }
+    .nav-menu a:nth-child(3) { animation-delay: 0.8s; }
+    .nav-menu a:nth-child(4) { animation-delay: 1s; }
+    .nav-menu a:nth-child(5) { animation-delay: 1.2s; }
+    .nav-menu a:nth-child(6) { animation-delay: 1.4s; }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(6px);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .logout {
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      transition: 0.3s ease;
+      animation: fadeInUp 0.9s 1.8s forwards;
+      opacity: 0;
+    }
+
+    .logout:hover {
+      background: #c0392b;
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 8px 18px rgba(231, 76, 60, 0.4);
+    }
+
+    /* === MAIN AREA === */
+    .main {
+      margin-left: 250px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-y: auto;
+      background: #f6faff;
+      animation: fadeIn 1s ease;
+    }
+
+    header {
+      background: white;
+      padding: 20px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    header h1 {
+      color: #007bff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .user-info {
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 10px;
+    }
+
+    .user-info:hover {
+      background: #eef4ff;
+      transform: scale(1.05);
+    }
+
+    /* === POPUP PROFIL === */
+    .profile-popup {
+      display: none;
+      position: absolute;
+      top: 70px;
+      right: 40px;
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 22px;
+      width: 260px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      animation: slideDown 0.4s ease;
+      z-index: 20;
+    }
+
+    .profile-popup h3 {
+      margin: 0 0 5px 0;
+      color: #007bff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .profile-popup p {
+      margin: 3px 0;
+      color: #444;
+      font-size: 14px;
+    }
+
+    .btn-edit {
+      background: linear-gradient(90deg, #007bff, #0056d6);
+      color: #fff;
+      font-weight: 600;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .btn-edit:hover {
+      background: linear-gradient(90deg, #0056d6, #003bb8);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 123, 255, 0.35);
+    }
+
+    .logout-btn {
+      background: #e74c3c;
+      color: #fff;
+      font-weight: 600;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2);
+    }
+
+    .logout-btn:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(231, 76, 60, 0.35);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    main { padding: 40px; flex-grow: 1; }
+
+    /* === FORM & TABEL (tidak diubah) === */
+    .add-form { background: white; padding: 30px 35px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0, 123, 255, 0.12); margin-bottom: 25px; border-top: 5px solid #007bff; animation: fadeUp 0.8s ease; }
+    .add-form h2 { margin-bottom: 15px; font-size: 20px; color: #007bff; font-weight: 700; }
+    .add-form form { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+    .add-form input, .add-form select { flex: 1 1 calc(20% - 10px); min-width: 160px; padding: 12px; border: 1.5px solid #ccdfff; border-radius: 10px; font-size: 14.5px; }
+    .add-form button { padding: 12px 25px; background: linear-gradient(90deg, #007bff, #0056d6); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 25px rgba(0, 123, 255, 0.12); animation: fadeUp 1s ease; }
+    th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #eef3ff; font-size: 15px; }
+    th { background: linear-gradient(90deg, #007bff, #0056d6); color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    footer { text-align: center; padding: 15px; background: #fff; color: #777; font-size: 13px; border-top: 1px solid #eee; }
+
+    /* === ANIMASI === */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-15px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-15px);} to {opacity: 1; transform: translateX(0);} }
+    @keyframes fadeSlideRight { from { opacity: 0; transform: translateX(-15px);} to { opacity: 1; transform: translateX(0);} }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px);} to { opacity: 1; transform: translateY(0);} }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <h2>🧠 🤖 DiagnoSmart</h2>
+      <p>AI-Based Medical Diagnostic System</p>
+    </div>
+
+    <div class="nav-menu">
+      <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('diagnosa_view') }}">🩺 Diagnosa</a>
+      <a href="{{ url_for('data_pasien_view') }}" class="active">🧍 Data Pasien</a>
+      <a href="{{ url_for('laporan') }}">📋 Laporan</a>
+      <a href="{{ url_for('informasi') }}">💊 Informasi Penyakit</a>
+      <a href="{{ url_for('profil') }}">👤 Profil</a>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header>
+      <h1>🧍 Data Pasien - DiagnoSmart</h1>
+      <div class="user-info" id="userProfile">👤 {{ username }}</div>
+
+      <!-- Popup Profil -->
+      <div class="profile-popup" id="profilePopup">
+        <h3>{{ username }}</h3>
+        <p>Email: user@example.com</p>
+        <p>Role: Dokter / Admin</p>
+        <button class="btn-edit" onclick="window.location='{{ url_for('edit_user') }}'">✏️ Edit Profil</button>
+        <button class="logout-btn" onclick="window.location='{{ url_for('logout') }}'">🚪 Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="add-form">
+        <h2>➕ Tambah Data Pasien</h2>
+        <form action="{{ url_for('data_pasien_view') }}" method="POST">
+          <input type="text" name="nama" placeholder="Nama Pasien" required>
+          <input type="number" name="umur" placeholder="Umur" required>
+          <select name="jk" required>
+            <option value="">-- Jenis Kelamin --</option>
+            <option value="Laki-laki">Laki-laki</option>
+            <option value="Perempuan">Perempuan</option>
+          </select>
+          <input type="text" name="alamat" placeholder="Alamat" required>
+          <input type="text" name="riwayat" placeholder="Riwayat Penyakit" required>
+          <button type="submit">🚀 Simpan Pasien</button>
+        </form>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Umur</th>
+            <th>Jenis Kelamin</th>
+            <th>Alamat</th>
+            <th>Riwayat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pasien in data_pasien %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ pasien.nama }}</td>
+            <td>{{ pasien.umur }}</td>
+            <td>{{ pasien.jenis_kelamin }}</td>
+            <td>{{ pasien.alamat }}</td>
+            <td>{{ pasien.riwayat }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+
+    <footer>
+      © 2025 DiagnoSmart | AI-Based Medical Diagnostic System
+    </footer>
+  </div>
+
+  <script>
+    const userProfile = document.getElementById('userProfile');
+    const profilePopup = document.getElementById('profilePopup');
+    userProfile.addEventListener('click', () => {
+      profilePopup.style.display = (profilePopup.style.display === 'block') ? 'none' : 'block';
+    });
+    document.addEventListener('click', (e) => {
+      if (!profilePopup.contains(e.target) && !userProfile.contains(e.target)) {
+        profilePopup.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+  
