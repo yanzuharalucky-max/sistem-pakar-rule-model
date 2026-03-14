@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧾 Struk Pembayaran - DiagnoSmart</title>
+  <style>
+    * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #f6faff 40%, #e0ebff);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0;
+    }
+    .struk-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,123,255,0.2);
+      padding: 40px 50px;
+      width: 450px;
+      animation: fadeIn 0.7s ease;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #007bff;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .header h1 {
+      color: #007bff;
+      font-size: 22px;
+      margin: 0;
+    }
+    .header p { color: #666; font-size: 14px; margin-top: 5px; }
+
+    table { width: 100%; font-size: 15px; border-collapse: collapse; }
+    td { padding: 6px 0; color: #333; }
+    td.label { color: #0056d6; font-weight: 600; }
+
+    .total-box {
+      border-top: 2px dashed #007bff;
+      margin-top: 15px;
+      padding-top: 10px;
+      font-weight: bold;
+      color: #0056d6;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .btn-cetak {
+      display: block;
+      width: 100%;
+      background: linear-gradient(90deg, #007bff, #0056d6);
+      color: white;
+      border: none;
+      padding: 12px 0;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 25px;
+    }
+    .btn-cetak:hover {
+      background: linear-gradient(90deg, #0056d6, #0043a3);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media print {
+      .btn-cetak { display: none; }
+      body { background: white; }
+      .struk-container { box-shadow: none; border: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="struk-container">
+    <div class="header">
+      <h1>🧾 Struk Pembayaran</h1>
+      <p>AI-Based Medical Diagnostic System</p>
+    </div>
+
+    <table>
+      <tr><td class="label">Nomor Transaksi</td><td id="trx"></td></tr>
+      <tr><td class="label">Tanggal</td><td id="tgl"></td></tr>
+      <tr><td class="label">Total Harga</td><td id="total"></td></tr>
+      <tr><td class="label">Uang Pasien</td><td id="uang"></td></tr>
+      <tr><td class="label">Kembalian</td><td id="kembali"></td></tr>
+    </table>
+
+    <div class="total-box">
+      <p>Terima kasih atas kepercayaan Anda kepada <b>DiagnoSmart</b>.</p>
+    </div>
+
+    <button class="btn-cetak" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+
+    <div class="footer">
+      <p>© 2025 DiagnoSmart | Klinik Cerdas Digital Indonesia</p>
+    </div>
+  </div>
+
+  <script>
+    // Ambil data dari URL query
+    const params = new URLSearchParams(window.location.search);
+    const total = Number(params.get("total") || 0);
+    const uang = Number(params.get("uang") || 0);
+    const kembali = Number(params.get("kembali") || 0);
+
+    // Jika tidak ada data, tampilkan pesan error
+    if (!params.has("total")) {
+      document.body.innerHTML = `
+        <div style="text-align:center;padding:40px;font-family:Segoe UI">
+          <h2>⚠️ Data tidak ditemukan</h2>
+          <p>Silakan kembali ke halaman <b>Diagnosa</b> dan lakukan pembayaran ulang.</p>
+          <a href="diagnosa.html" style="display:inline-block;margin-top:20px;
+          background:#007bff;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;">
+            🔙 Kembali ke Diagnosa
+          </a>
+        </div>`;
+    } else {
+      // Isi data struk
+      const now = new Date();
+      document.getElementById("tgl").textContent = now.toLocaleString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      document.getElementById("trx").textContent = "TRX" + now.getTime();
+      document.getElementById("total").textContent = "Rp " + total.toLocaleString("id-ID");
+      document.getElementById("uang").textContent = "Rp " + uang.toLocaleString("id-ID");
+      document.getElementById("kembali").textContent = "Rp " + kembali.toLocaleString("id-ID");
+    }
+  </script>
+</body>
+</html>
