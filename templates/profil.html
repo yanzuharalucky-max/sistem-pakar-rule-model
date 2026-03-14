@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Profil Pengguna - DiagnoSmart</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f4f9ff;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* === SIDEBAR (100% sama seperti dashboard) === */
+    .sidebar {
+      background: linear-gradient(180deg, #007bff, #0056d6);
+      color: white;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 25px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+      border-radius: 0 25px 25px 0;
+      animation: fadeInLeft 0.8s ease;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 35px;
+      opacity: 0;
+      animation: fadeIn 1s 0.3s forwards;
+    }
+
+    .brand h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      letter-spacing: 0.6px;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: #cfe1ff;
+      margin-top: 3px;
+      font-style: italic;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* animasi sidebar seperti dashboard */
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e3f2fd;
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      transform: translateX(-15px);
+      opacity: 0;
+      animation: fadeSlideRight 0.6s ease forwards;
+    }
+
+    .nav-menu a:nth-child(1) { animation-delay: 0.4s; }
+    .nav-menu a:nth-child(2) { animation-delay: 0.6s; }
+    .nav-menu a:nth-child(3) { animation-delay: 0.8s; }
+    .nav-menu a:nth-child(4) { animation-delay: 1s; }
+    .nav-menu a:nth-child(5) { animation-delay: 1.2s; }
+    .nav-menu a:nth-child(6) { animation-delay: 1.4s; }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(6px);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .logout {
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      transition: 0.3s ease;
+      animation: fadeInUp 0.9s 1.8s forwards;
+      opacity: 0;
+    }
+
+    .logout:hover {
+      background: #c0392b;
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 8px 18px rgba(231, 76, 60, 0.4);
+    }
+
+    /* === MAIN AREA (tidak diubah) === */
+    .main {
+      margin-left: 250px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background: white;
+      padding: 20px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    header h1 {
+      color: #007bff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .user-info {
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    main {
+      padding: 40px;
+      overflow-y: auto;
+      flex-grow: 1;
+      background: #f6faff;
+      animation: fadeIn 1s ease;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #fff;
+      color: #777;
+      font-size: 13px;
+      border-top: 1px solid #eee;
+    }
+
+    /* === PROFILE CARD === */
+    .profile-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0, 123, 255, 0.1);
+      padding: 40px;
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: fadeUp 0.8s forwards;
+    }
+
+    .profile-card img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      margin-bottom: 18px;
+      border: 4px solid #007bff;
+    }
+
+    .profile-card h2 {
+      color: #007bff;
+      margin-bottom: 5px;
+      font-size: 1.5rem;
+    }
+
+    .profile-card p {
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .info-list {
+      text-align: left;
+      margin-top: 20px;
+      line-height: 1.8;
+    }
+
+    .info-list label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-top: 10px;
+    }
+
+    .info-list input {
+      width: 100%;
+      padding: 8px 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .info-list input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 4px rgba(0,123,255,0.3);
+    }
+
+    .btn-edit {
+      background: linear-gradient(45deg, #00a8ff, #007bff);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 25px;
+      font-size: 15px;
+    }
+
+    .btn-edit:hover {
+      background: linear-gradient(45deg, #0066cc, #004ecb);
+    }
+
+    /* === ANIMATIONS === */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeSlideRight { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <h2>🧠 🤖 DiagnoSmart</h2>
+      <p>AI-Based Medical Diagnostic System</p>
+    </div>
+
+    <div class="nav-menu">
+      <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('diagnosa_view') }}">🩺 Diagnosa</a>
+      <a href="{{ url_for('data_pasien_view') }}">🧍 Data Pasien</a>
+      <a href="{{ url_for('laporan') }}">📋 Laporan</a>
+      <a href="{{ url_for('informasi') }}">💊 Informasi Penyakit</a>
+      <a href="{{ url_for('profil') }}" class="active">👤 Profil</a>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header>
+      <h1>👤 Profil Pengguna</h1>
+      <div class="user-info">{{ user.nama }}</div>
+    </header>
+
+    <main>
+      <div class="profile-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User Photo">
+        <h2>{{ user.nama }}</h2>
+        <p>{{ user.role }}</p>
+
+        <form method="POST" action="{{ url_for('edit_user') }}">
+          <div class="info-list">
+            <label>Username</label>
+            <input type="text" name="username" value="{{ user.username }}" required>
+
+            <label>Nama Lengkap</label>
+            <input type="text" name="nama" value="{{ user.nama }}" required>
+
+            <label>Password Baru (opsional)</label>
+            <input type="password" name="password" placeholder="Biarkan kosong jika tidak ingin mengganti">
+
+            <label>Email</label>
+            <input type="email" value="{{ user.email }}" disabled>
+          </div>
+
+          <button type="submit" class="btn-edit">💾 Simpan Perubahan</button>
+        </form>
+      </div>
+    </main>
+
+    <footer>
+      © 2025 DiagnoSmart | AI-Based Medical Diagnostic System
+    </footer>
+  </div>
+
+</body>
+</html>
