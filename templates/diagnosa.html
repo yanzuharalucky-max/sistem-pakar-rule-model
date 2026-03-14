@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagnosa - DiagnoSmart</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f4f9ff;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      background: linear-gradient(180deg, #007bff, #0056d6);
+      color: white;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 25px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+      border-radius: 0 25px 25px 0;
+      animation: fadeInLeft 0.8s ease;
+      z-index: 10;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 35px;
+      opacity: 0;
+      animation: fadeIn 1s 0.3s forwards;
+    }
+
+    .brand h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      letter-spacing: 0.6px;
+    }
+
+    .brand p {
+      font-size: 13px;
+      color: #cfe1ff;
+      margin-top: 3px;
+      font-style: italic;
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #e3f2fd;
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      transform: translateX(-15px);
+      opacity: 0;
+      animation: fadeSlideRight 0.6s ease forwards;
+    }
+
+    .nav-menu a:nth-child(1) { animation-delay: 0.4s; }
+    .nav-menu a:nth-child(2) { animation-delay: 0.6s; }
+    .nav-menu a:nth-child(3) { animation-delay: 0.8s; }
+    .nav-menu a:nth-child(4) { animation-delay: 1s; }
+    .nav-menu a:nth-child(5) { animation-delay: 1.2s; }
+    .nav-menu a:nth-child(6) { animation-delay: 1.4s; }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(6px);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .logout {
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      transition: 0.3s ease;
+      animation: fadeInUp 0.9s 1.8s forwards;
+      opacity: 0;
+    }
+
+    .logout:hover {
+      background: #c0392b;
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 8px 18px rgba(231, 76, 60, 0.4);
+    }
+
+    /* === MAIN AREA === */
+    .main {
+      margin-left: 250px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-y: auto;
+      background: #f6faff;
+      animation: fadeIn 1s ease;
+    }
+
+    header {
+      background: white;
+      padding: 20px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    header h1 {
+      color: #007bff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .user-info {
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: 0.3s ease;
+    }
+
+    .user-info:hover {
+      background: #eef4ff;
+      transform: scale(1.05);
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* === GRID HASIL DAN OBAT === */
+    .diagnosa-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    /* === FORM DIAGNOSA === */
+    .diagnosa-container {
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15);
+      padding: 40px 50px;
+      text-align: left;
+      animation: fadeUp 0.9s ease;
+      border-top: 6px solid #007bff;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 12px;
+      border: 1.5px solid #ccdfff;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #007bff, #0056d6);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 25px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .btn-primary:hover { transform: translateY(-3px); }
+
+    .hasil-box {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #e8f4ff;
+      border-left: 5px solid #007bff;
+    }
+
+    .resep-container {
+      display: none;
+      background: #ffffff;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 123, 255, 0.15);
+      padding: 40px 40px;
+      border-top: 6px solid #007bff;
+      animation: fadeUp 0.9s ease;
+    }
+
+    .resep-container h3 {
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+
+    .resep-container table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    .resep-container td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 15px;
+    }
+
+    .total-box {
+      text-align: right;
+      font-weight: bold;
+      color: #0056d6;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #fff;
+      color: #777;
+      font-size: 13px;
+      border-top: 1px solid #eee;
+    }
+
+    /* === POPUP OVERLAY PEMBAYARAN === */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .popup {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px 24px;
+      width: 420px;
+      text-align: left;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.25s ease;
+    }
+
+    .popup h3 {
+      color: #007bff;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .popup .row { display:flex; gap:10px; align-items:center; }
+    .popup .label { font-weight:600; color:#333; margin-bottom:6px; display:block; }
+    .popup input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid #ccdfff;
+      font-size: 15px;
+    }
+
+    .popup .info {
+      font-size: 14px;
+      margin-top: 8px;
+      color: #333;
+    }
+
+    .popup .actions { display:flex; gap:10px; margin-top:14px; }
+    .btn-cancel {
+      background:#d1d5db;
+      border:none;padding:10px;border-radius:10px;cursor:pointer;font-weight:700;
+    }
+    .btn-confirm {
+      background:linear-gradient(90deg,#007bff,#0056d6);color:white;border:none;padding:10px;border-radius:10px;cursor:pointer;font-weight:700;
+    }
+    .btn-confirm:disabled { opacity:0.6; cursor:not-allowed; }
+
+    .popup .small-muted { font-size:13px;color:#666;margin-top:8px; }
+
+    /* loading */
+    .loading {
+      display:inline-block;
+      margin-left:8px;
+      width:14px;height:14px;border-radius:50%;
+      border:3px solid #cfe1ff;border-top-color:#007bff;animation:spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg);} }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-15px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-15px);} to {opacity: 1; transform: translateX(0);} }
+    @keyframes fadeSlideRight { from { opacity: 0; transform: translateX(-15px);} to {opacity: 1; transform: translateX(0);} }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px);} to {opacity: 1; transform: translateY(0);} }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
+
+    /* Responsive (small screens) — keep sidebar but allow content to stack */
+    @media (max-width: 900px) {
+      .diagnosa-wrapper { grid-template-columns: 1fr; padding: 0 10px; }
+      .main { padding: 20px; margin-left: 0; }
+      .sidebar { position: relative; width: 100%; height: auto; border-radius: 0 0 20px 20px; display: none; } /* hide to keep simple on small screen */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <h2>🧠 🤖 DiagnoSmart</h2>
+      <p>AI-Based Medical Diagnostic System</p>
+    </div>
+
+    <div class="nav-menu">
+      <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('diagnosa_view') }}" class="active">🩺 Diagnosa</a>
+      <a href="{{ url_for('data_pasien_view') }}">🧍 Data Pasien</a>
+      <a href="{{ url_for('laporan') }}">📋 Laporan</a>
+      <a href="{{ url_for('informasi') }}">💊 Informasi Penyakit</a>
+      <a href="{{ url_for('profil') }}">👤 Profil</a>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header>
+      <h1>🩺 Sistem Diagnosa Cerdas - DiagnoSmart</h1>
+      <div class="user-info" id="userProfile">👤 {{ username }}</div>
+    </header>
+
+    <main>
+      <div class="diagnosa-wrapper">
+        <div class="diagnosa-container">
+          <h2>🧠 Form Diagnosa Pasien</h2>
+          <form id="diagnosaForm">
+            <label>Gejala I</label>
+            <input id="g1" type="text" required placeholder="Masukkan gejala pertama...">
+            <label>Gejala II</label>
+            <input id="g2" type="text" placeholder="Masukkan gejala kedua...">
+            <label>Gejala III</label>
+            <input id="g3" type="text" placeholder="Masukkan gejala ketiga...">
+            <label>Gejala IV</label>
+            <input id="g4" type="text" placeholder="Masukkan gejala keempat...">
+            <label>Gejala V</label>
+            <input id="g5" type="text" placeholder="Masukkan gejala kelima...">
+            <button id="prosesBtn" class="btn-primary" type="submit">🚀 Proses Diagnosa</button>
+          </form>
+
+          <div id="hasilDiagnosa" style="display:none;">
+            <div class="hasil-box">
+              <h3 id="diagnosaTitle">🧬 Hasil Diagnosa:</h3>
+              <p id="diagnosaText">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- OBAT DI SEBELAH KANAN -->
+        <div class="resep-container" id="resepContainer">
+          <h3>💊 Pilih Resep Obat</h3>
+          <table id="tObat">
+            <tr><td><input type="checkbox" class="obat" data-harga="50000" data-nama="Amoxicillin 500mg"> Amoxicillin 500mg — Rp50.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="20000" data-nama="Paracetamol 500mg"> Paracetamol 500mg — Rp20.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="30000" data-nama="Vitamin C 1000mg"> Vitamin C 1000mg — Rp30.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="40000" data-nama="Ibuprofen 200mg"> Ibuprofen 200mg — Rp40.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="35000" data-nama="Cefadroxil 500mg"> Cefadroxil 500mg — Rp35.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="25000" data-nama="Loratadine 10mg"> Loratadine 10mg — Rp25.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="28000" data-nama="Omeprazole 20mg"> Omeprazole 20mg — Rp28.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="18000" data-nama="Antasida DOEN"> Antasida DOEN — Rp18.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="15000" data-nama="Oralit"> Oralit — Rp15.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="27000" data-nama="CTM 4mg"> CTM 4mg — Rp27.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="22000" data-nama="Dexamethasone 0.5mg"> Dexamethasone 0.5mg — Rp22.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="55000" data-nama="Ciprofloxacin 500mg"> Ciprofloxacin 500mg — Rp55.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="33000" data-nama="Metformin 500mg"> Metformin 500mg — Rp33.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="37000" data-nama="Simvastatin 10mg"> Simvastatin 10mg — Rp37.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="32000" data-nama="Amlodipine 5mg"> Amlodipine 5mg — Rp32.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="26000" data-nama="Captopril 25mg"> Captopril 25mg — Rp26.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="19000" data-nama="Diazepam 2mg"> Diazepam 2mg — Rp19.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="42000" data-nama="Furosemide 40mg"> Furosemide 40mg — Rp42.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="31000" data-nama="Salbutamol 2mg"> Salbutamol 2mg — Rp31.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="29000" data-nama="Prednison 5mg"> Prednison 5mg — Rp29.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="23000" data-nama="Asam Mefenamat 500mg"> Asam Mefenamat 500mg — Rp23.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="34000" data-nama="Ketoconazole 200mg"> Ketoconazole 200mg — Rp34.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="38000" data-nama="Albendazole 400mg"> Albendazole 400mg — Rp38.000</td></tr>
+            <tr><td><input type="checkbox" class="obat" data-harga="41000" data-nama="Ranitidine 150mg"> Ranitidine 150mg — Rp41.000</td></tr>
+          </table>
+
+          <div class="total-box" id="totalHarga">Total: Rp0</div>
+          <div style="margin-top:12px; display:flex; gap:10px;">
+            <button id="bayarBtn" class="btn-primary" style="flex:1">💰 Bayar Sekarang</button>
+            <button id="resetObat" class="btn-primary" style="background:#6b7280; width:120px;">Reset</button>
+          </div>
+
+          <!-- area untuk cetak struk muncul setelah pembayaran sukses -->
+          <div id="afterPaymentArea" style="margin-top:14px; display:none;">
+            <button id="cetakStrukBtn" class="btn-primary">🧾 Cetak Struk</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+
+    <footer>
+      © 2025 DiagnoSmart | AI-Based Medical Diagnostic System
+    </footer>
+  </div>
+
+  <!-- POPUP OVERLAY PEMBAYARAN -->
+  <div class="overlay" id="overlay">
+    <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+      <h3 id="popupTitle">Pembayaran</h3>
+
+      <div>
+        <div class="label">Total Bayar</div>
+        <div id="popupTotal" style="font-size:18px;font-weight:700;color:#0056d6">Rp0</div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label class="label">Masukkan Uang Pasien (Rp)</label>
+        <input id="inputUang" type="number" min="0" placeholder="Contoh: 150000" />
+      </div>
+
+      <div style="margin-top:8px;">
+        <div class="label">Kembalian</div>
+        <div id="popupKembali" style="font-size:16px;font-weight:700">Rp0</div>
+      </div>
+
+      <div class="small-muted" id="paymentNote" style="margin-top:10px;color:#7b8794">Pastikan jumlah uang pasien benar sebelum konfirmasi.</div>
+
+      <div class="actions">
+        <button class="btn-cancel" id="closeOverlay">Batal</button>
+        <button class="btn-confirm" id="confirmPayment" disabled>Konfirmasi Pembayaran</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Elemen utama ---
+    const form = document.getElementById("diagnosaForm");
+    const hasilBox = document.getElementById("hasilDiagnosa");
+    const diagnosaText = document.getElementById("diagnosaText");
+    const diagnosaTitle = document.getElementById("diagnosaTitle");
+    const resep = document.getElementById("resepContainer");
+    const checkboxes = document.querySelectorAll(".obat");
+    const totalBox = document.getElementById("totalHarga");
+    const bayarBtn = document.getElementById("bayarBtn");
+    const overlay = document.getElementById("overlay");
+    const popupTotal = document.getElementById("popupTotal");
+    const inputUang = document.getElementById("inputUang");
+    const popupKembali = document.getElementById("popupKembali");
+    const confirmPayment = document.getElementById("confirmPayment");
+    const closeOverlay = document.getElementById("closeOverlay");
+    const afterPaymentArea = document.getElementById("afterPaymentArea");
+    const cetakStrukBtn = document.getElementById("cetakStrukBtn");
+    const resetObat = document.getElementById("resetObat");
+    const userProfile = document.getElementById("userProfile");
+
+    // state
+    let currentTotal = 0;
+    let lastPayment = { total: 0, uang: 0, kembali: 0 };
+
+    // --- helper: ambil username dari elemen userProfile (bersihkan emoji dan whitespace) ---
+    function getLoggedUsername() {
+      if (!userProfile) return "";
+      const raw = userProfile.textContent || "";
+      // hapus emoji/prefix seperti '👤' kalau ada, lalu trim
+      return raw.replace(/^[^\w\d]+/, "").trim() || raw.trim();
+    }
+
+    // --- Diagnosa sederhana berbasis kata kunci ---
+    function generateDiagnosisFromInputs(values) {
+      const text = values.join(" ").toLowerCase();
+      // cek kata kunci
+      const rules = [
+        { keys: ["demam","panas","suhu"], result: "Kemungkinan infeksi (mis. flu atau demam). Periksa suhu tubuh dan observasi gejala lain." },
+        { keys: ["batuk","pilek"], result: "Kemungkinan ISPA / flu ringan. Istirahat, konsumsi cairan, dan konsultasi bila memburuk." },
+        { keys: ["sakit kepala","pusing"], result: "Sakit kepala / pusing. Perlu observasi; istirahat dan hidrasi." },
+        { keys: ["mual","muntah","diare"], result: "Gejala pencernaan (mual/muntah/diare). Perhatikan hidrasi & elektrolit." },
+        { keys: ["sesak","nafas","napas"], result: "Gejala pernapasan serius. Pertimbangkan pemeriksaan lanjutan jika sesak berlanjut." },
+        { keys: ["nyeri","sakit","nyeri otot","nyeri sendi"], result: "Nyeri lokal/umum—bisa karena inflamasi atau cedera." }
+      ];
+      for (const r of rules) {
+        if (r.keys.some(k => text.includes(k))) return r.result;
+      }
+      // default
+      return "Terindikasi infeksi ringan atau gangguan umum. Rekomendasi: observasi, istirahat, dan konsultasi bila memburuk.";
+    }
+
+    // --- Loading visual kecil saat proses diagnosa ---
+    function showLoadingDuring(cb, ms=700) {
+      const btn = document.getElementById("prosesBtn");
+      if (!btn) { cb(); return; }
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Menganalisis gejala... <span class="loading"></span>';
+      setTimeout(() => {
+        cb();
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }, ms);
+    }
+
+    // submit form diagnosa
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const vals = [
+        document.getElementById("g1").value || "",
+        document.getElementById("g2").value || "",
+        document.getElementById("g3").value || "",
+        document.getElementById("g4").value || "",
+        document.getElementById("g5").value || ""
+      ];
+
+      // show loading then result
+     // === Setelah diagnosa selesai diproses ===
+    showLoadingDuring(() => {
+      const diagnosis = generateDiagnosisFromInputs(vals);
+      diagnosaText.textContent = diagnosis;
+      hasilBox.style.display = "block";
+      resep.style.display = "block";
+      resep.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // === Simpan ke localStorage (fix bug selector & sertakan nama) ===
+      const gejala = vals.filter(Boolean);
+      const hasil = diagnosis;
+      // gunakan nodeList checkboxes yg benar (class "obat")
+      const obatDipilih = [...checkboxes].filter(c => c.checked).map(c => c.dataset.nama || c.getAttribute('data-nama') || c.nextSibling?.textContent?.trim() || '');
+
+      // Hitung total harga
+      const totalHarga = [...checkboxes].filter(c => c.checked).reduce((acc, c) => {
+        return acc + (parseInt(c.dataset.harga || c.getAttribute('data-harga') || 0, 10) || 0);
+      }, 0);
+
+      // Ambil nama user (dari header) sebagai pengisi kolom Nama di laporan
+      const namaUser = getLoggedUsername() || "-";
+
+      // Buat objek laporan lengkap
+      const laporan = {
+        nama: namaUser,
+        tanggal: new Date().toLocaleString("id-ID"),
+        gejala,
+        hasil,
+        obat: obatDipilih,
+        total: totalHarga
+      };
+
+      // Simpan ke localStorage
+      let daftar = JSON.parse(localStorage.getItem("laporanPasien") || "[]");
+      daftar.push(laporan);
+      localStorage.setItem("laporanPasien", JSON.stringify(daftar));
+      console.log("✅ Laporan disimpan:", laporan);
+
+    }, 900);
+    });
+
+    // --- Hitung total obat ---
+    function updateTotal() {
+      let total = 0;
+      checkboxes.forEach(c => {
+        if (c.checked) total += parseInt(c.dataset.harga || 0, 10);
+      });
+      currentTotal = total;
+      totalBox.textContent = "Total: Rp" + total.toLocaleString("id-ID");
+      return total;
+    }
+
+    // === TABEL RIWAYAT HASIL DIAGNOSA (opsional helper) ===
+    const tabelRiwayat = document.getElementById("tabelRiwayat"); // optional; tidak dipaksa
+
+    let nomor = 1;
+
+    function simpanKeRiwayat(gejalaList, hasil, obatList) {
+      if (!tabelRiwayat) return; // kalau tabel belum ada, skip
+
+      const row = tabelRiwayat.insertRow(-1);
+      const cellNo = row.insertCell(0);
+      const cellGejala = row.insertCell(1);
+      const cellHasil = row.insertCell(2);
+      const cellObat = row.insertCell(3);
+      const cellTanggal = row.insertCell(4);
+      const cellAksi = row.insertCell(5);
+
+      cellNo.textContent = nomor++;
+      cellGejala.textContent = gejalaList.filter(g => g.trim() !== "").join(", ");
+      cellHasil.textContent = hasil;
+      cellObat.textContent = obatList.length > 0 ? obatList.join(", ") : "-";
+      cellTanggal.textContent = new Date().toLocaleString("id-ID", { dateStyle: "short", timeStyle: "medium" });
+      cellAksi.innerHTML = `<button class="hapus-btn" style="padding:5px 10px;border:none;background:#e74c3c;color:white;border-radius:8px;cursor:pointer;">Hapus</button>`;
+
+      // hapus baris
+      cellAksi.querySelector("button").addEventListener("click", () => {
+        row.remove();
+      });
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener("change", updateTotal);
+    });
+
+    // reset obat
+    resetObat.addEventListener("click", () => {
+      checkboxes.forEach(c => c.checked = false);
+      updateTotal();
+      afterPaymentArea.style.display = "none";
+    });
+
+    // --- Bayar sekarang (buka overlay) ---
+    bayarBtn.addEventListener("click", () => {
+      const total = updateTotal();
+      if (total <= 0) {
+        alert("Pilih minimal satu obat sebelum melakukan pembayaran.");
+        return;
+      }
+      popupTotal.textContent = "Rp " + total.toLocaleString("id-ID");
+      popupKembali.textContent = "Rp 0";
+      inputUang.value = "";
+      confirmPayment.disabled = true;
+      overlay.style.display = "flex";
+      inputUang.focus();
+    });
+
+    // close overlay
+    closeOverlay.addEventListener("click", () => {
+      overlay.style.display = "none";
+    });
+
+    // update kembalian saat input uang diisi
+    inputUang.addEventListener("input", () => {
+      const uang = parseInt(inputUang.value || "0", 10);
+      const kembali = uang - currentTotal;
+      popupKembali.textContent = (kembali < 0) ? ("Kurang Rp " + Math.abs(kembali).toLocaleString("id-ID")) : ("Rp " + kembali.toLocaleString("id-ID"));
+      // aktifkan tombol confirm kalau uang >= total
+      confirmPayment.disabled = isNaN(uang) || uang < currentTotal;
+    });
+
+    // konfirmasi pembayaran
+  confirmPayment.addEventListener("click", () => {
+  const uang = parseInt(inputUang.value || "0", 10);
+  if (isNaN(uang) || uang < currentTotal) {
+    alert("Jumlah uang tidak valid atau kurang.");
+    return;
+  }
+
+  const kembali = uang - currentTotal;
+  lastPayment = { total: currentTotal, uang, kembali };
+  overlay.style.display = "none";
+  afterPaymentArea.style.display = "block";
+  totalBox.textContent = 
+    "Total: Rp" + currentTotal.toLocaleString("id-ID") + 
+    " • Terbayar: Rp" + uang.toLocaleString("id-ID") + 
+    " • Kembali: Rp" + kembali.toLocaleString("id-ID");
+  
+  alert("Pembayaran berhasil. Klik 'Cetak Struk' untuk invoice.");
+
+  // === 🔽 Tambahan: Simpan laporan ke localStorage ===
+  const gejala = [
+    document.getElementById("g1").value,
+    document.getElementById("g2").value,
+    document.getElementById("g3").value,
+    document.getElementById("g4").value,
+    document.getElementById("g5").value
+  ].filter(Boolean);
+
+  const hasil = diagnosaText.textContent || "-";
+  const obatDipilih = [...checkboxes]
+    .filter(c => c.checked)
+    .map(c => c.dataset.nama || c.getAttribute("data-nama") || "");
+
+  const namaUser = getLoggedUsername() || "-";
+
+  const laporan = {
+    nama: namaUser,
+    tanggal: new Date().toLocaleString("id-ID"),
+    gejala,
+    hasil,
+    obat: obatDipilih,
+    total: currentTotal,
+    uangDibayar: uang,
+    kembalian: kembali
+  };
+
+  let daftar = JSON.parse(localStorage.getItem("laporanPasien") || "[]");
+  daftar.push(laporan);
+  localStorage.setItem("laporanPasien", JSON.stringify(daftar));
+
+  console.log("🧾 Laporan disimpan ke localStorage:", laporan);
+});
+
+    // tombol cetak struk -> buka struk.html dengan query params
+    cetakStrukBtn.addEventListener("click", () => {
+      const { total, uang, kembali } = lastPayment;
+      // safety check
+      if (!total || typeof total !== "number") {
+        alert("Belum ada pembayaran yang dikonfirmasi.");
+        return;
+      }
+      // buka struk.html dengan query params (encode)
+      const url = `struk.html?total=${encodeURIComponent(total)}&uang=${encodeURIComponent(uang)}&kembali=${encodeURIComponent(kembali)}`;
+      window.open(url, "_blank");
+    });
+
+    // untuk kasus user ingin cetak langsung setelah confirm: juga aktifkan cetakStrukBtn jika area terlihat
+    // (ini juga untuk akses keyboard)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") overlay.style.display = "none";
+    });
+
+    // init total
+    updateTotal();
+  </script>
+</body>
+</html>
