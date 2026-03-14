@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Diagnosa Pasien - DiagnoSmart</title>
+  <style>
+    * { box-sizing: border-box; transition: all 0.3s ease; }
+    body {
+      margin: 0; font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #f4f9ff; display: flex; height: 100vh; overflow: hidden;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      background: linear-gradient(180deg, #007bff, #0056d6);
+      color: white; width: 260px; display: flex; flex-direction: column;
+      justify-content: space-between; padding: 25px 20px; position: fixed;
+      top: 0; left: 0; bottom: 0; border-radius: 0 30px 30px 0;
+      box-shadow: 4px 0 15px rgba(0,0,0,0.15); animation: fadeInLeft 0.8s ease;
+    }
+
+    .brand {
+      text-align: center; margin-bottom: 35px; opacity: 0;
+      animation: fadeIn 1s 0.3s forwards;
+    }
+    .brand h2 { font-size: 22px; font-weight: 700; margin: 0; color: #fff; }
+    .brand p { font-size: 13px; color: #cfe1ff; margin-top: 3px; font-style: italic; }
+
+    .nav-menu { display: flex; flex-direction: column; gap: 8px; }
+    .nav-menu a {
+      display: flex; align-items: center; gap: 10px; color: #e3f2fd; text-decoration: none;
+      padding: 12px 15px; border-radius: 12px; font-weight: 600; font-size: 15px;
+      transform: translateX(-15px); opacity: 0; animation: fadeSlideRight 0.6s ease forwards;
+    }
+    .nav-menu a:nth-child(1){animation-delay:0.4s}
+    .nav-menu a:nth-child(2){animation-delay:0.6s}
+    .nav-menu a:nth-child(3){animation-delay:0.8s}
+    .nav-menu a:nth-child(4){animation-delay:1s}
+    .nav-menu a:nth-child(5){animation-delay:1.2s}
+    .nav-menu a:nth-child(6){animation-delay:1.4s}
+
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      transform: translateX(6px);
+      box-shadow: 0 4px 10px rgba(255,255,255,0.1);
+    }
+
+    .logout {
+      background: #e74c3c;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      opacity: 0;
+      animation: fadeInUp 0.9s 1.8s forwards;
+    }
+    .logout:hover {
+      background: #c0392b;
+      transform: scale(1.08) rotate(-1deg);
+      box-shadow: 0 8px 18px rgba(231,76,60,0.4);
+    }
+
+    /* === MAIN === */
+    .main {
+      margin-left: 260px; flex-grow: 1; display: flex; flex-direction: column;
+      height: 100vh; overflow-y: auto; background: #f6faff; animation: fadeIn 1s ease;
+    }
+
+    header {
+      background: white; padding: 20px 35px; display: flex;
+      justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      position: sticky; top: 0; z-index: 5; animation: fadeInDown 0.8s ease;
+    }
+    header h1 { color: #007bff; font-size: 24px; margin: 0; font-weight: 700; }
+    .user-info {
+      font-weight: 600; color: #333; display: flex; align-items: center;
+      gap: 8px; cursor: pointer; padding: 8px 14px; border-radius: 8px;
+    }
+    .user-info:hover { background: rgba(0,123,255,0.1); }
+
+    /* === POPUP PROFIL === */
+    .profile-popup {
+      position: absolute; top: 70px; right: 40px; background: #fff; border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15); padding: 20px; width: 260px;
+      opacity: 0; transform: translateY(-10px); pointer-events: none;
+      transition: all 0.3s ease; z-index: 100;
+    }
+    .profile-popup.active {
+      opacity: 1; transform: translateY(0); pointer-events: all;
+    }
+    .profile-popup h3 { margin: 0; color: #007bff; font-size: 18px; font-weight: 700; }
+    .profile-popup p { margin: 5px 0; color: #555; font-size: 14px; }
+    .profile-popup button {
+      width: 100%; margin-top: 10px; padding: 10px; border: none;
+      border-radius: 8px; cursor: pointer; font-weight: 600;
+    }
+    .btn-edit { background: #007bff; color: white; }
+    .btn-logout { background: #e74c3c; color: white; }
+    .btn-edit:hover { background: #0066d6; }
+    .btn-logout:hover { background: #c0392b; }
+
+    main { flex-grow: 1; padding: 40px; display: flex; justify-content: center; align-items: flex-start; }
+
+    /* === LAPORAN CONTAINER === */
+    .laporan-container {
+      background: white; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,123,255,0.15);
+      padding: 40px 50px; max-width: 1000px; width: 100%; text-align: left;
+      animation: fadeUp 0.9s ease; border-top: 6px solid #007bff;
+    }
+    .laporan-header {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .laporan-container h2 {
+      color: #007bff; font-size: 22px; font-weight: 700; margin-bottom: 20px;
+    }
+    .cetak-btn {
+      background: linear-gradient(90deg,#007bff,#0056d6);
+      color: #fff; padding: 10px 18px; border-radius: 10px;
+      text-decoration: none; font-weight: 600;
+      box-shadow: 0 5px 12px rgba(0,123,255,0.25); transition: 0.3s ease;
+    }
+    .cetak-btn:hover {
+      background: #0062e0; transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0,123,255,0.35);
+    }
+    table {
+      width: 100%; border-collapse: collapse; border-radius: 12px;
+      overflow: hidden; box-shadow: 0 5px 18px rgba(0,123,255,0.1);
+    }
+    th, td {
+      padding: 14px 18px; text-align: left;
+      border-bottom: 1px solid #eee; font-size: 14.5px;
+    }
+    th {
+      background: #007bff; color: white; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    tr:hover { background: #f4f9ff; }
+    .hapus-btn {
+      background: #e74c3c; color: white; border: none; padding: 8px 14px;
+      border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;
+      transition: 0.3s ease;
+    }
+    .hapus-btn:hover {
+      background: #c0392b; transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(231,76,60,0.3);
+    }
+
+    footer {
+      text-align: center; padding: 15px; background: #fff;
+      color: #777; font-size: 13px; border-top: 1px solid #eee;
+    }
+
+    /* === ANIMASI === */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeInDown{from{opacity:0;transform:translateY(-15px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeInLeft{from{opacity:0;transform:translateX(-15px);}to{opacity:1;transform:translateX(0);}}
+    @keyframes fadeSlideRight{from{opacity:0;transform:translateX(-15px);}to{opacity:1;transform:translateX(0);}}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(15px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <h2>🧠 🤖 DiagnoSmart</h2>
+      <p>AI-Based Medical Diagnostic System</p>
+    </div>
+
+    <div class="nav-menu">
+      <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('diagnosa_view') }}">🩺 Diagnosa</a>
+      <a href="{{ url_for('data_pasien_view') }}">🧍 Data Pasien</a>
+      <a href="{{ url_for('laporan') }}" class="active">📋 Laporan</a>
+      <a href="{{ url_for('informasi') }}">💊 Informasi Penyakit</a>
+      <a href="{{ url_for('profil') }}">👤 Profil</a>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header>
+      <h1>📋 Laporan Diagnosa Pasien</h1>
+      <div class="user-info" id="userProfileToggle">👤 {{ username }}</div>
+
+      <!-- POPUP PROFIL -->
+      <div class="profile-popup" id="profilePopup">
+        <h3>{{ username }}</h3>
+        <p>Email: {{ email if email else 'user@example.com' }}</p>
+        <p>Role: {{ role if role else 'Dokter' }}</p>
+        <hr style="border:none;border-top:1px solid #eee;margin:10px 0;">
+        <button class="btn-edit" onclick="window.location='{{ url_for('edit_user') }}'">✏️ Edit Profil</button>
+        <button class="btn-logout" onclick="window.location='{{ url_for('logout') }}'">🚪 Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="laporan-container">
+        <div class="laporan-header">
+          <h2>📄 Daftar Laporan Diagnosa</h2>
+          <a href="#" class="cetak-btn" onclick="window.print()">🖨️ Cetak Laporan</a>
+        </div>
+
+        <table id="tabelLaporan">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Gejala</th>
+              <th>Hasil Diagnosa</th>
+              <th>Obat Direkomendasikan</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="laporanBody">
+            <tr><td colspan="7" style="text-align:center; color:#888;">Belum ada laporan tersimpan.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>© 2025 DiagnoSmart | AI-Based Medical Diagnostic System</footer>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('userProfileToggle');
+    const popup = document.getElementById('profilePopup');
+    toggle.addEventListener('click', () => popup.classList.toggle('active'));
+    document.addEventListener('click', e => {
+      if (!popup.contains(e.target) && !toggle.contains(e.target)) popup.classList.remove('active');
+    });
+
+    const tbody = document.getElementById("laporanBody");
+    function renderTabel() {
+      let laporan = JSON.parse(localStorage.getItem("laporanPasien") || "[]");
+      if (laporan.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#888;">Belum ada laporan tersimpan.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = laporan.map((l, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${l.nama || '-'}</td>
+          <td>${Array.isArray(l.gejala) ? l.gejala.join(", ") : (l.gejala || '-')}</td>
+          <td>${l.hasil || '-'}</td>
+          <td>${Array.isArray(l.obat) ? l.obat.join(", ") : (l.obat || '-')}</td>
+          <td>${l.tanggal || '-'}</td>
+          <td><button class="hapus-btn" onclick="hapusLaporan(${i})">Hapus</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function hapusLaporan(index) {
+      let laporan = JSON.parse(localStorage.getItem("laporanPasien") || "[]");
+      if (confirm("Yakin ingin menghapus laporan ini?")) {
+        laporan.splice(index, 1);
+        localStorage.setItem("laporanPasien", JSON.stringify(laporan));
+        renderTabel();
+      }
+    }
+
+    renderTabel();
+  </script>
+</body>
+</html>
